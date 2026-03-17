@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jacqueline Le — Data Scientist</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e0e0f;
+      --bg2: #161618;
+      --surface: #1e1e21;
+      --border: #2a2a2e;
+      --accent: #c8f06a;
+      --accent2: #6af0c8;
+      --text: #f0ede8;
+      --muted: #888890;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(14,14,15,0.85);
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.8rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+    }
+    .hero-label {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.35s forwards;
+    }
+    .hero-name em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-tagline {
+      margin-top: 1.5rem;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 520px;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.5s forwards;
+    }
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.65s forwards;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.75rem;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0e0e0f;
+      border: 1px solid var(--accent);
+      font-weight: 500;
+    }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* grid accent lines */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,240,106,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,240,106,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(200,240,106,0.07) 0%, transparent 70%);
+      right: 5%; top: 20%;
+      pointer-events: none;
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 3rem; }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.4;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+    .section-title em { font-style: italic; color: var(--accent2); }
+
+    /* ── ABOUT ── */
+    #about { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1000px;
+      align-items: center;
+    }
+    .about-text p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    .about-text p strong { color: var(--text); font-weight: 500; }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .stat-number {
+      font-family: var(--serif);
+      font-size: 2.5rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); font-family: var(--mono); letter-spacing: 0.05em; }
+
+    /* ── SKILLS ── */
+    #skills { max-width: 1000px; margin: 0 auto; }
+    .skills-section { max-width: 1000px; }
+    .skill-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; margin-top: 3rem; }
+    .skill-group { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; transition: border-color 0.2s; }
+    .skill-group:hover { border-color: var(--accent2); }
+    .skill-group-title {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--accent2);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .skill-tag {
+      display: inline-block;
+      background: rgba(106,240,200,0.07);
+      border: 1px solid rgba(106,240,200,0.2);
+      color: var(--text);
+      font-size: 0.82rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      margin: 0.25rem 0.25rem 0 0;
+      font-family: var(--mono);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .skill-tag:hover { background: rgba(106,240,200,0.14); border-color: var(--accent2); }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+      display: flex; flex-direction: column;
+      transition: border-color 0.25s, transform 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .project-card:hover::before { transform: scaleX(1); }
+    .project-num {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+    }
+    .project-title { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.75rem; line-height: 1.2; }
+    .project-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; flex: 1; margin-bottom: 1.25rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .project-tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 0.25rem 0.6rem;
+      background: rgba(200,240,106,0.07);
+      border: 1px solid rgba(200,240,106,0.2);
+      border-radius: 3px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .contact-body {
+      display: flex;
+      gap: 5rem;
+      margin-top: 3rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .contact-text {
+      flex: 1;
+      min-width: 250px;
+    }
+    .contact-text p { color: var(--muted); font-size: 1rem; line-height: 1.8; max-width: 400px; }
+    .contact-links { display: flex; flex-direction: column; gap: 1.25rem; }
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.2s;
+      min-width: 260px;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); transform: translateX(4px); }
+    .contact-link-icon { font-size: 1.1rem; }
+    .contact-link-sub { font-size: 0.72rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .contact-link:hover .contact-link-sub { color: var(--accent); opacity: 0.7; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    /* Ensure nothing stays hidden if JS fails */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.25rem; }
+      section { padding: 4rem 1.5rem; }
+      #hero { padding: 7rem 1.5rem 3rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#hero">JL.dev</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <p class="hero-label">Data Scientist</p>
+    <h1 class="hero-name">Jacqueline<br/><em>Le.</em></h1>
+    <p class="hero-tagline">Analytically minded Data Science professional with hands-on experience in Python, SQL, machine learning, and statistical analysis — across government, non-profit, and private sectors.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View My Work</a>
+      <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-text">
+        <div class="section-label">About Me</div>
+        <h2 class="section-title">Turning data into <em>decisions</em></h2>
+        <p>I'm a Data Science professional with a 2:1 Professional Certificate from the <strong>University of Toronto</strong> and a BSc from the <strong>University of Guelph</strong>. I bring hands-on experience in Python, SQL, machine learning, and statistical analysis.</p>
+        <p>My career spans <strong>government, non-profit, and private sectors</strong> — currently leading a Microsoft 365 digital transformation at the Honourable Society of the Middle Temple in London, designing automated data workflows and building scalable information systems.</p>
+        <p>Seeking a <strong>Data Analyst or Data Scientist role</strong> where analytical rigour and cross-sector experience can drive data-informed decision making.</p>
+        <div style="margin-top:2rem">
+          <a href="#contact" class="btn btn-primary">Open to Opportunities</a>
+        </div>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-number">2:1</div>
+          <div class="stat-label">UofT Data Science certificate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">10+</div>
+          <div class="stat-label">Years professional experience</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">99.8%</div>
+          <div class="stat-label">Data accuracy at OMAFRA</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Sectors: gov · non-profit · private</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-label">Expertise</div>
+    <h2 class="section-title">Skills &amp; <em>Tools</em></h2>
+    <div class="skill-groups">
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Languages & Tools</div>
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">SQL</span>
+        <span class="skill-tag">IBM SPSS</span>
+        <span class="skill-tag">Excel (Advanced)</span>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Python Libraries</div>
+        <span class="skill-tag">NumPy</span>
+        <span class="skill-tag">Pandas</span>
+        <span class="skill-tag">Matplotlib</span>
+        <span class="skill-tag">Seaborn</span>
+        <span class="skill-tag">Scikit-learn</span>
+        <span class="skill-tag">TensorFlow</span>
+        <span class="skill-tag">PyTorch</span>
+        <span class="skill-tag">SciPy</span>
+        <span class="skill-tag">Statsmodels</span>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Machine Learning</div>
+        <span class="skill-tag">Supervised Learning</span>
+        <span class="skill-tag">Unsupervised Learning</span>
+        <span class="skill-tag">Deep Learning</span>
+        <span class="skill-tag">K-Means Clustering</span>
+        <span class="skill-tag">Decision Trees</span>
+        <span class="skill-tag">Random Forest</span>
+        <span class="skill-tag">Gradient Boosting</span>
+        <span class="skill-tag">Feature Engineering</span>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Statistical Analysis</div>
+        <span class="skill-tag">Hypothesis Testing</span>
+        <span class="skill-tag">Descriptive Statistics</span>
+        <span class="skill-tag">Inferential Statistics</span>
+        <span class="skill-tag">Experimental Design</span>
+        <span class="skill-tag">Granger Causality</span>
+        <span class="skill-tag">Time Series Analysis</span>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Databases & Platforms</div>
+        <span class="skill-tag">MongoDB</span>
+        <span class="skill-tag">Relational Databases</span>
+        <span class="skill-tag">CRM Systems</span>
+        <span class="skill-tag">SharePoint</span>
+        <span class="skill-tag">Power Automate</span>
+        <span class="skill-tag">Microsoft 365</span>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Specialisms</div>
+        <span class="skill-tag">Data Governance</span>
+        <span class="skill-tag">GDPR Compliance</span>
+        <span class="skill-tag">Digital Transformation</span>
+        <span class="skill-tag">Process Automation</span>
+        <span class="skill-tag">Regulatory Compliance</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" style="background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="section-label">Projects</div>
+    <h2 class="section-title">Data Science <em>Projects</em></h2>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-num">2024 · Group Project · University of Toronto</div>
+        <h3 class="project-title">CPI vs S&P 500 — Statistical Relationship Analysis</h3>
+        <p class="project-desc">Investigated whether Consumer Price Index (CPI) and S&P 500 performance can predict each other using 20 years of monthly data (2000–2023). Resolved data quality issues including date inconsistencies and format mismatches, then produced dual-axis visualisations revealing a Pearson correlation of <strong style="color:var(--accent)">r = 0.84</strong>. Applied ADF stationarity tests and Granger causality — finding that S&P 500 significantly Granger-causes CPI (p &lt; 0.01), but not vice versa.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">Pandas</span>
+          <span class="project-tag">NumPy</span>
+          <span class="project-tag">Matplotlib</span>
+          <span class="project-tag">SciPy</span>
+          <span class="project-tag">Statsmodels</span>
+          <span class="project-tag">Time Series</span>
+          <span class="project-tag">Granger Causality</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-num">2024 · Group Project · University of Toronto WATSPEED</div>
+        <h3 class="project-title">Japanese Cherry Blossom ML Prediction Model</h3>
+        <p class="project-desc">Collaborated in a team of five to analyse 69 years of bloom data across 58 sites in all 47 prefectures of Japan (1955–2023). Cleaned 1.4M+ temperature values and merged multiple datasets. Implemented and compared <strong style="color:var(--accent)">9 ML models</strong> including Gradient Boosting, Random Forest, and Elastic Net (lowest MSE: 0.10). Confirmed +2.7°C temperature rise over 50 years driving earlier bloom dates, with the most dramatic shifts post-1997.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">Scikit-learn</span>
+          <span class="project-tag">Pandas</span>
+          <span class="project-tag">Seaborn</span>
+          <span class="project-tag">Gradient Boosting</span>
+          <span class="project-tag">Random Forest</span>
+          <span class="project-tag">GridSearchCV</span>
+          <span class="project-tag">Ensemble Methods</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-num">2026 · University of London Certification</div>
+        <h3 class="project-title">Banknote Authentication via K-Means Clustering</h3>
+        <p class="project-desc">Built an unsupervised ML model to classify genuine vs. forged banknotes on a dataset of 1,372 samples (OpenML), using wavelet-transform-derived features. Applied StandardScaler normalisation and progressively expanded from 2 to 4 features. Visualised cluster separation with Matplotlib scatter plots and critically evaluated the model — proposing supervised alternatives (logistic regression, random forests, neural networks) for improved accuracy.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">K-Means</span>
+          <span class="project-tag">Scikit-learn</span>
+          <span class="project-tag">Unsupervised Learning</span>
+          <span class="project-tag">Feature Engineering</span>
+          <span class="project-tag">Matplotlib</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-num">Mini Project · University of Toronto</div>
+        <h3 class="project-title">Parkinson's Disease Detection — XGBoost</h3>
+        <p class="project-desc">Built a binary classification model to detect Parkinson's disease from 195 biomedical voice recordings across 31 patients (23 with PD). Extracted 22 dysphonia features, applied <strong style="color:var(--accent)">MinMaxScaler</strong> normalisation to the range [-1, 1], and trained an XGBoost classifier with an 80/20 stratified split. Evaluated model performance using <strong style="color:var(--accent)">accuracy_score</strong>, achieving strong discrimination between healthy and PD-positive cases.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">XGBoost</span>
+          <span class="project-tag">Scikit-learn</span>
+          <span class="project-tag">MinMaxScaler</span>
+          <span class="project-tag">Binary Classification</span>
+          <span class="project-tag">Pandas</span>
+          <span class="project-tag">NumPy</span>
+        </div>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-num">Mini Project · University of Toronto</div>
+        <h3 class="project-title">Iris Flower Classification — SVM</h3>
+        <p class="project-desc">Built a supervised classification model to identify three iris species (Setosa, Versicolour, Virginica) from petal and sepal measurements. Performed EDA with Seaborn pair plots and Matplotlib bar charts to visualise per-class feature averages. Trained a Support Vector Classifier with an 80/20 train-test split, evaluated with <strong style="color:var(--accent)">sklearn accuracy_score</strong>, and serialised the final model using Pickle for reuse and deployment.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">Scikit-learn</span>
+          <span class="project-tag">SVM</span>
+          <span class="project-tag">Seaborn</span>
+          <span class="project-tag">Matplotlib</span>
+          <span class="project-tag">Pandas</span>
+          <span class="project-tag">Pickle</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-label">Work</div>
+    <h2 class="section-title">Work <em>Experience</em></h2>
+    <div class="projects-grid">
+      <div class="project-card reveal">
+        <div class="project-num">2025 – Present · London, UK</div>
+        <h3 class="project-title">Records Management Officer</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">The Honourable Society of the Middle Temple</p>
+        <p class="project-desc">Leading a full-scale Microsoft 365 migration to SharePoint, designing automated retention workflows using Power Automate, and authoring departmental retention schedules aligned to GDPR and UK legislative requirements.</p>
+        <div class="project-tags">
+          <span class="project-tag">SharePoint</span>
+          <span class="project-tag">Power Automate</span>
+          <span class="project-tag">GDPR</span>
+          <span class="project-tag">Data Governance</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">2018 – 2025</div>
+        <h3 class="project-title">Customer Service Administrator</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">Agricorp</p>
+        <p class="project-desc">Managed large-scale customer datasets via CRM software, designed improved documentation workflows to reduce operational friction, and applied data-driven decision-making in performance reviews.</p>
+        <div class="project-tags">
+          <span class="project-tag">CRM</span>
+          <span class="project-tag">SQL</span>
+          <span class="project-tag">Process Optimisation</span>
+          <span class="project-tag">Reporting</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">2017 – 2018 · Ontario, Canada</div>
+        <h3 class="project-title">Data Entry & Processing Clerk</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">Ministry of Agriculture, Food and Rural Affairs</p>
+        <p class="project-desc">Processed 200+ complex Pest Assessment Reports weekly at 99.8% accuracy. Led a digitisation initiative converting physical government records to digital format, managing data migration and database optimisation.</p>
+        <div class="project-tags">
+          <span class="project-tag">Data Quality</span>
+          <span class="project-tag">Digital Transformation</span>
+          <span class="project-tag">Government Data</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">2016 – 2017 · Guelph, Canada</div>
+        <h3 class="project-title">Reservation Agent</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">Camis Inc.</p>
+        <p class="project-desc">Managed real-time data across Parks Canada and Ontario Parks systems. Consistently exceeded quality and efficiency targets by 15% through data-driven process improvements and performance analytics.</p>
+        <div class="project-tags">
+          <span class="project-tag">Multi-Platform Integration</span>
+          <span class="project-tag">Performance Analytics</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">2015 · Mississauga, Canada</div>
+        <h3 class="project-title">Administrative Assistant</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">Food Banks Canada</p>
+        <p class="project-desc">Provided analytical support to Research and Advocacy departments, maintained financial records tracking organisational purchases and expenses, and resolved e-learning platform technical issues.</p>
+        <div class="project-tags">
+          <span class="project-tag">Research Support</span>
+          <span class="project-tag">Financial Data</span>
+          <span class="project-tag">Non-profit</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">2014 · Guelph, Canada</div>
+        <h3 class="project-title">Research Assistant</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">University of Guelph — Hospitality, Food & Tourism Management</p>
+        <p class="project-desc">Designed and executed a primary research study for the Farmers' Market Certification Program Evaluation. Used IBM SPSS and Excel for hypothesis testing, descriptive statistics, and end-to-end research pipeline management.</p>
+        <div class="project-tags">
+          <span class="project-tag">IBM SPSS</span>
+          <span class="project-tag">Hypothesis Testing</span>
+          <span class="project-tag">Research Design</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION & CERTIFICATIONS -->
+  <section id="education" style="background:var(--bg);">
+    <div class="section-label">Credentials</div>
+    <h2 class="section-title">Education & <em>Certifications</em></h2>
+    <div class="projects-grid" style="margin-top:3rem;">
+      <div class="project-card reveal">
+        <div class="project-num">Completed 2024</div>
+        <h3 class="project-title">Professional Certificate — Data Science (2:1)</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">University of Toronto</p>
+        <p class="project-desc">Key areas: machine learning, SQL, Python, statistical modelling, big data (MongoDB), data visualisation.</p>
+        <div class="project-tags">
+          <span class="project-tag">Python</span>
+          <span class="project-tag">SQL</span>
+          <span class="project-tag">MongoDB</span>
+          <span class="project-tag">ML</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">Completed 2015</div>
+        <h3 class="project-title">BSc (Honours) — Psychology: Brain & Cognition, Biological Sciences</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">University of Guelph</p>
+        <p class="project-desc">Strong foundation in research methodology, statistical analysis, and scientific data interpretation.</p>
+        <div class="project-tags">
+          <span class="project-tag">Research Methods</span>
+          <span class="project-tag">Statistics</span>
+          <span class="project-tag">Data Interpretation</span>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-num">Feb 2026</div>
+        <h3 class="project-title">Foundations of Data Science: K-Means Clustering in Python</h3>
+        <p class="project-desc" style="font-size:0.82rem;color:var(--accent2);margin-bottom:0.5rem;font-family:var(--mono);">University of London</p>
+        <p class="project-desc">Certification in applied clustering techniques using Python, covering unsupervised learning fundamentals and practical implementation.</p>
+        <div class="project-tags">
+          <span class="project-tag">K-Means</span>
+          <span class="project-tag">Python</span>
+          <span class="project-tag">Unsupervised Learning</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-label">Contact</div>
+    <h2 class="section-title">Let's <em>Connect</em></h2>
+    <div class="contact-body">
+      <div class="contact-text reveal">
+        <p>I'm currently open to new opportunities in data science and machine learning. Whether it's a full-time role, collaboration, or just a conversation about data — I'd love to hear from you.</p>
+      </div>
+      <div class="contact-links reveal">
+        <a class="contact-link" href="/cdn-cgi/l/email-protection#dfb3baf1b5bebcaeaabab3b6b1babc9fb8b2beb6b3f1bcb0b2">
+          <span class="contact-link-icon">✉</span>
+          <span>
+            <span class="__cf_email__" data-cfemail="660a03480c07051713030a0f08030526010b070f0a4805090b">[email&#160;protected]</span>
+            <span class="contact-link-sub">Email me directly</span>
+          </span>
+        </a>
+        <a class="contact-link" href="https://linkedin.com/in/jacquelinecle" target="_blank">
+          <span class="contact-link-icon">in</span>
+          <span>
+            linkedin.com/in/jacquelinecle
+            <span class="contact-link-sub">Connect on LinkedIn</span>
+          </span>
+        </a>
+        <a class="contact-link" href="https://github.com/Jinariox3" target="_blank">
+          <span class="contact-link-icon">⌥</span>
+          <span>
+            github.com/Jinariox3
+            <span class="contact-link-sub">View my repositories</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2025 Jacqueline Le — Data Scientist</span>
+    <span>Built with HTML &amp; CSS · Hosted on <a href="https://pages.github.com" target="_blank">GitHub Pages</a></span>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
+    // Fallback: reveal anything still hidden after 1.5s
+    setTimeout(() => reveals.forEach(el => el.classList.add('visible')), 1500);
+  </script>
+</body>
+</html>
